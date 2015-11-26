@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE overlay [
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
+%browserDTD;
+<!ENTITY % tabutilsDTD SYSTEM "chrome://tabutils/locale/tabutils.dtd">
+%tabutilsDTD;
+]>
+
+<overlay id="tabutils-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/javascript" src="tulib.js"/>
+  <script type="application/javascript" src="tabutils.js"/>
+  <script type="application/javascript" src="tabutils-view.js"/>
+  <script type="application/javascript" src="tabutils-handler.js"/>
+  <script type="application/javascript" src="tabutils-tabcontextmenu.js"/>
+  <script type="application/javascript" src="tabutils-click.js"/>
+  <script type="application/javascript">
+  <![CDATA[
+    TU_hookCode("goDoCommand", /.*doCommand.*/, "$& else {let cmd = top.document.getElementById(arguments[1]);if (cmd) cmd.doCommand();}");
+  ]]>
+  </script>
+
+  <menupopup id="tabContextMenu" oncommand="gBrowser.selectedTabs = [];">
+
+    <menu id="context_tabViewMenu"
+          multiselected="any">
+      <menupopup id="context_tabViewMenuPopup"
+                 onpopupshowing="TabView.populateGroupMenu(event.target);"
+                 oncommand="var tab = gBrowser.mContextTab; TabView._initFrame(function() {if (!event.originalTarget.value) TabView.moveTabTo(tab); TabView.moveTabsTo(gBrowser.mContextTabs, event.originalTarget.value || tab._tabViewTabItem.parent);});">
+        <menuitem id="context_tabViewNewGroup" oncommand=""/>
+        <menuseparator/>
+      </menupopup>
+    </menu>
+
+    <menu id="context_mergeGroup"
+          label="&mergeGroup.label;"
+          accesskey="&mergeGroup.accesskey;"
+          insertafter="context_tabViewMenu">
+      <menupopup onpopupshowing="TabView.populateGroupMenu(event.target, true);"
+                 oncommand="TabView.mergeGroup(event.originalTarget.value);">
+        <menuitem label="&mergeAllGroups.label;"
+                  oncommand="TabView._window.UI.reset();"/>
+        <menuseparator/>
+      </menupopup>
+    </menu>
+
+    <menu id="context_moveToWindow"
+          label="&moveToWindow.label;"
+          accesskey="&moveToWindow.accesskey;"
+          insertafter="context_openTabInWindow"
+          multiselected="any">
+      <menupopup onpopupshowing="tabutils.populateWindowMenu(event.target, true);"
+                 oncommand="gBrowser.moveTabToWindow(gBrowser.mContextTabs, event.originalTarget.window);">
+        <menuitem label="&newNavigatorCmd.label;"/>
+        <menuseparator/>
+      </menupopup>
+    </menu>
+
+    <menu id="context_mergeWindow"
+          label="&mergeWindow.label;"
+          accesskey="&mergeWindow.accesskey;"
+          insertafter="context_moveToWindow">
+      <menupopup onpopupshowing="tabutils.populateWindowMenu(event.target);"
+                 oncommand="var tabbrowser = event.originalTarget.window.gBrowser;tabbrowser.moveTabToWindow(Array.slice(tabbrowser.mTabs), window);">
+        <menuitem label="&mergeAllWindows.label;"
+                  oncommand="for (var item = this.nextSibling.nextSibling; item; item = item.nextSibling) item.click();event.stopPropagation();"/>
+        <menuseparator/>
+      </menupopup>
+    </menu>
+
+  </menupopup>
+</overlay>
