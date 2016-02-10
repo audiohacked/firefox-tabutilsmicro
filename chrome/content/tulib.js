@@ -1,10 +1,10 @@
-let {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+// let {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 XPCOMUtils.defineLazyModuleGetter(this, "TabmixSvc",
   "resource://tabmixplus/Services.jsm");
 let TMP_console = TabmixSvc.console;
 
-function TU_hookCode(aStr) {
+function TUMu_hookCode(aStr) {
   try {
     var namespaces = aStr.split(".");
 
@@ -22,14 +22,14 @@ function TU_hookCode(aStr) {
     if (typeof object[method] != "function")
       throw TypeError(aStr + " is not a function");
 
-    return object[method] = TU_hookFunc.apply(this, Array.concat(object[method], Array.slice(arguments, 1)));
+    return object[method] = TUMu_hookFunc.apply(this, Array.concat(object[method], Array.slice(arguments, 1)));
   }
   catch (e) {
     Components.utils.reportError("Failed to hook " + aStr + ": " + e.message);
   }
 }
 
-function TU_hookSetter(aStr) {
+function TUMu_hookSetter(aStr) {
   try {
     var namespaces = aStr.split(".");
 
@@ -48,7 +48,7 @@ function TU_hookSetter(aStr) {
     if (!orgSetter)
       throw TypeError(aStr + " has no setter");
 
-    var mySetter = TU_hookFunc.apply(this, Array.concat(orgSetter, Array.slice(arguments, 1)));
+    var mySetter = TUMu_hookFunc.apply(this, Array.concat(orgSetter, Array.slice(arguments, 1)));
     object.__defineGetter__(property, object.__lookupGetter__(property));
     object.__defineSetter__(property, mySetter);
 
@@ -59,7 +59,7 @@ function TU_hookSetter(aStr) {
   }
 }
 
-function TU_hookFunc(aFunc) {
+function TUMu_hookFunc(aFunc) {
   var myCode = aFunc.toString();
   var orgCode, newCode, flags;
 
@@ -105,7 +105,7 @@ function TU_hookFunc(aFunc) {
   return eval("(" + myCode + ")");
 }
 
-function TU_getPref(aPrefName, aDefault) {
+function TUMu_getPref(aPrefName, aDefault) {
   switch (Services.prefs.getPrefType(aPrefName)) {
     case Services.prefs.PREF_BOOL: return Services.prefs.getBoolPref(aPrefName);
     case Services.prefs.PREF_INT: return Services.prefs.getIntPref(aPrefName);
@@ -120,7 +120,7 @@ function TU_getPref(aPrefName, aDefault) {
   }
 }
 
-function TU_setPref(aPrefName, aValue) {
+function TUMu_setPref(aPrefName, aValue) {
   switch (Services.prefs.getPrefType(aPrefName)) {
     case Services.prefs.PREF_BOOL: Services.prefs.setBoolPref(aPrefName, aValue);break;
     case Services.prefs.PREF_INT: Services.prefs.setIntPref(aPrefName, aValue);break;

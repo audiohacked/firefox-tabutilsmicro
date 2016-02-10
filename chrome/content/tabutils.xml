@@ -78,29 +78,29 @@
           this.setAttribute("notoverflowing", "true");
           this._updateScrollButtonsDisabledState();
 
-          PinnedTabsBar = TU_hookFunc(PlacesToolbar,
+          PinnedTabsBar = TUMu_hookFunc(PlacesToolbar,
             ["PlacesToolbar", "PinnedTabsBar", "g"],
             ["PlacesChevron", "PinnedTabsBarChevron", "g"]
           );
           PinnedTabsBar.prototype.__proto__ = PlacesToolbar.prototype;
 
-          TU_hookCode("PinnedTabsBar.prototype._insertNewItem", /.*button.className.*/, function() {
+          TUMu_hookCode("PinnedTabsBar.prototype._insertNewItem", /.*button.className.*/, function() {
             button.className = "tabbrowser-tab";
             button.setAttribute("faviconized", true);
             button.setAttribute("pinned", true);
             button.setAttribute("style", "position: static !important; height: auto !important;");
             button.setAttribute("context", "placesContext");
           });
-          TU_hookCode("PinnedTabsBar.prototype._rebuild", "}", "gBrowser.mTabContainer.positionPinnedTabs(true);");
+          TUMu_hookCode("PinnedTabsBar.prototype._rebuild", "}", "gBrowser.mTabContainer.positionPinnedTabs(true);");
 
           ["nodeInserted", "nodeRemoved", "nodeMoved"].forEach(function(aMethod) {
-            TU_hookCode.call(PinnedTabsBar.prototype, aMethod,
+            TUMu_hookCode.call(PinnedTabsBar.prototype, aMethod,
               [/.*_removeChild\((.*)\).*/, "var tab = $1.tab;$&"],
               ["this.updateChevron();", "$&;var tab;if (tab) gBrowser.mTabContainer.positionPinnedTab(tab);gBrowser.mTabContainer.positionPinnedTabs();"]
             );
           });
 
-          TU_hookSetter("PlacesViewBase.prototype.place", /.*executeQueries[\s\S]*addObserver.*/, "try {$&} catch (e) {}");  //Fx 4.0
+          TUMu_hookSetter("PlacesViewBase.prototype.place", /.*executeQueries[\s\S]*addObserver.*/, "try {$&} catch (e) {}");  //Fx 4.0
 
           let pinnedbox = this._pinnedbox;
           pinnedbox._selectNewTab = function() {};
@@ -234,7 +234,7 @@
 
         let linkHandler = Components.classes["@mozilla.org/content/dropped-link-handler;1"].
                             getService(Components.interfaces.nsIDroppedLinkHandler);
-        if (linkHandler.canDropLink(event, TU_getPref("extensions.tabutils.dragAndGo", true)))
+        if (linkHandler.canDropLink(event, TUMu_getPref("extensions.tabutils.dragAndGo", true)))
           event.preventDefault();
       ]]>
       </handler>

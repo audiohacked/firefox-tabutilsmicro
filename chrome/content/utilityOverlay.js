@@ -2,7 +2,7 @@
   if (!("whereToOpenLink" in window))
     return;
 
-  TU_hookCode("whereToOpenLink", "{", function() {
+  TUMu_hookCode("whereToOpenLink", "{", function() {
     var target;
     switch (TMP_console.callerName()) {
       case "PUIU_openNodeWithEvent":  //Fx 4.0
@@ -47,20 +47,20 @@
     var openInTab, loadInBackground, prefName = "Bookmarks";
     switch (target) {
       case "bookmarks":
-        openInTab = TU_getPref("extensions.tabutils.openBookmarksInTab", true);
-        loadInBackground = TU_getPref("browser.tabs.loadBookmarksInBackground", false); // Bug 707672 [Fx11]
+        openInTab = TUMu_getPref("extensions.tabutils.openBookmarksInTab", true);
+        loadInBackground = TUMu_getPref("browser.tabs.loadBookmarksInBackground", false); // Bug 707672 [Fx11]
         break;
       case "homepage":
-        openInTab = TU_getPref("extensions.tabutils.openHomepageInTab", false);
-        //loadInBackground = TU_getPref("extensions.tabutils.loadHomepageInBackground", false);
+        openInTab = TUMu_getPref("extensions.tabutils.openHomepageInTab", false);
+        //loadInBackground = TUMu_getPref("extensions.tabutils.loadHomepageInBackground", false);
         break;
       case "urlbar":
-        openInTab = TU_getPref("extensions.tabutils.openUrlInTab", true);
-        loadInBackground = TU_getPref("extensions.tabutils.loadUrlInBackground", false);
+        openInTab = TUMu_getPref("extensions.tabutils.openUrlInTab", true);
+        loadInBackground = TUMu_getPref("extensions.tabutils.loadUrlInBackground", false);
         break;
       case "searchbar":
-        openInTab = TU_getPref("browser.search.openintab");
-        loadInBackground = TU_getPref("extensions.tabutils.loadSearchInBackground", false);
+        openInTab = TUMu_getPref("browser.search.openintab");
+        loadInBackground = TUMu_getPref("extensions.tabutils.loadSearchInBackground", false);
         break;
       case "links": //Fx 4.0
         openInTab = tabutils.gOpenLinkInTab;
@@ -69,7 +69,7 @@
     }
   });
 
-  TU_hookCode("whereToOpenLink",
+  TUMu_hookCode("whereToOpenLink",
     [/return "current";/, "e = {shiftKey:false, ctrlKey:false, metaKey:false, altKey:false, button:0};"],
     [/(?=return "current";)/, function() {
       if (alt) // Bug 713052 [Fx13]
@@ -84,17 +84,17 @@
     }],
     [/"tab"/g, 'loadInBackground == null ? "tab" : loadInBackground ? "background" : "foreground"'],
     [/"tabshifted"/g, 'loadInBackground == null ? "tabshifted" : loadInBackground ? "foreground" : "background"'],
-    [/"window"/, 'shift && TU_getPref("extensions.tabutils.shiftClick" + prefName, 0) ? "current" : $&'],
+    [/"window"/, 'shift && TUMu_getPref("extensions.tabutils.shiftClick" + prefName, 0) ? "current" : $&'],
     [/(?=if \((ctrl|meta))/, function(s, s1) (function() {
       if (openInTab &&
-          ($1 && TU_getPref("extensions.tabutils.ctrlClick" + prefName) & 0x01 ||
-          middle && middleUsesTabs && TU_getPref("extensions.tabutils.middleClick" + prefName, 0) & 1))
+          ($1 && TUMu_getPref("extensions.tabutils.ctrlClick" + prefName) & 0x01 ||
+          middle && middleUsesTabs && TUMu_getPref("extensions.tabutils.middleClick" + prefName, 0) & 1))
         return "current";
     }).toString().replace(/^.*{|}$/g, "").replace("$1", s1)],
-    [/shift(?= \?)/, '$& ^ (TU_getPref("extensions.tabutils." + (middle ? "middleClick" : "ctrlClick") + prefName) & 0x02) > 0']
+    [/shift(?= \?)/, '$& ^ (TUMu_getPref("extensions.tabutils." + (middle ? "middleClick" : "ctrlClick") + prefName) & 0x02) > 0']
   );
 
-  TU_hookCode("openLinkIn",
+  TUMu_hookCode("openLinkIn",
     [/(?=if \(where == "save"\))/, function() { //Bookmarklet
       if (url.startsWith("javascript:"))
         where = "current";
@@ -114,52 +114,52 @@
     "openNodeWithEvent", "openNodeIn", "_openNodeIn",
     "openContainerNodeInTabs", "openURINodesInTabs", "_openTabset"
   ].forEach(function(name) {
-    if (!PlacesUIUtils["TU_" + name]) {
-      PlacesUIUtils["TU_" + name] = PlacesUIUtils[name];
+    if (!PlacesUIUtils["TUMu_" + name]) {
+      PlacesUIUtils["TUMu_" + name] = PlacesUIUtils[name];
       PlacesUIUtils.__defineGetter__(name, function() {
-        return ("_getTopBrowserWin" in this && this._getTopBrowserWin() || window)["TU_" + name] || this["TU_" + name];
+        return ("_getTopBrowserWin" in this && this._getTopBrowserWin() || window)["TUMu_" + name] || this["TUMu_" + name];
       });
       PlacesUIUtils.__defineSetter__(name, function(val) {
-        return ("_getTopBrowserWin" in this && this._getTopBrowserWin() || window)["TU_" + name] = val;
+        return ("_getTopBrowserWin" in this && this._getTopBrowserWin() || window)["TUMu_" + name] = val;
       });
     }
-    if (!window["TU_" + name]) {
-      window["TU_" + name] = PlacesUIUtils["TU_" + name];
+    if (!window["TUMu_" + name]) {
+      window["TUMu_" + name] = PlacesUIUtils["TUMu_" + name];
     }
   });
 
   //侧边栏书签
-  TU_hookCode("TU_openNodeWithEvent", /_openNodeIn\((.*)\)/, function(s, s1) s.replace(s1, (s1 = s1.split(","), s1.push("aEvent || {}"), s1.join())));
-  TU_hookCode("TU__openNodeIn",
+  TUMu_hookCode("TUMu_openNodeWithEvent", /_openNodeIn\((.*)\)/, function(s, s1) s.replace(s1, (s1 = s1.split(","), s1.push("aEvent || {}"), s1.join())));
+  TUMu_hookCode("TUMu__openNodeIn",
     ["{", "var aEvent = arguments[arguments.length - 1];"],
     ['aWhere == "current"', '(aEvent ? !aEvent.button && !aEvent.ctrlKey && !aEvent.altKey && !aEvent.shiftKey && !aEvent.metaKey : $&)']
   );
 
   //新标签页书签
-  TU_hookCode("TU__openNodeIn",
+  TUMu_hookCode("TUMu__openNodeIn",
     [/(?=.*PlacesUtils.annotations.*)/, 'if (aNode.tags && aNode.tags.split(",").indexOf("tab") != -1) aWhere = "tab";']
   );
 
   //书签组
-  TU_hookCode("TU__openTabset", /.*gBrowser.loadTabs.*/, function(s)
+  TUMu_hookCode("TUMu__openTabset", /.*gBrowser.loadTabs.*/, function(s)
     s.replace("false", "where == 'current'")
-     .replace("loadInBackground", "where == 'background' ? true : where == 'foreground' ? false : $& ^ browserWindow.TU_getPref('browser.tabs.loadBookmarksInBackground')")
+     .replace("loadInBackground", "where == 'background' ? true : where == 'foreground' ? false : $& ^ browserWindow.TUMu_getPref('browser.tabs.loadBookmarksInBackground')")
   );
 
   //Open internal links in current tab
-  TU_hookCode("TU__openNodeIn", /(.*inBackground.*?\))(,?)/, "$1, event: aEvent$2");
+  TUMu_hookCode("TUMu__openNodeIn", /(.*inBackground.*?\))(,?)/, "$1, event: aEvent$2");
 
-  TU_hookCode("openUILinkIn",
+  TUMu_hookCode("openUILinkIn",
     ["{", "var lastArg = Object(arguments[arguments.length - 1]);"],
     [/(?=.*openLinkIn.*)/, function() {
       params.event = lastArg.event;
     }]
   );
 
-  TU_hookCode("openLinkIn",
+  TUMu_hookCode("openLinkIn",
     ["{", "var lastArg = Object(arguments[arguments.length - 1]);"],
     [/(?=let loadInBackground)/, function() {
-      if (lastArg.event && where != "current" && TU_getPref("extensions.tabutils.openInternalInCurrent", false)) {
+      if (lastArg.event && where != "current" && TUMu_getPref("extensions.tabutils.openInternalInCurrent", false)) {
         let e = lastArg.event;
         if (!e.button && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
           let aDomain = w.tabutils.getDomainFromURI(w.gBrowser.currentURI);
@@ -171,14 +171,14 @@
     }]
   );
 
-  TU_hookCode("openUILink", /(?=.*whereToOpenLink.*)/, function() {
+  TUMu_hookCode("openUILink", /(?=.*whereToOpenLink.*)/, function() {
     params.event = event;
   });
 
   //Open bookmarks with title/history
-  TU_hookCode("TU__openNodeIn", /(.*inBackground.*aEvent)(,?)/, "$1, title: aNode.title, itemId: aNode.itemId == -1 ? null : aNode.itemId$2");
+  TUMu_hookCode("TUMu__openNodeIn", /(.*inBackground.*aEvent)(,?)/, "$1, title: aNode.title, itemId: aNode.itemId == -1 ? null : aNode.itemId$2");
 
-  TU_hookCode("openUILinkIn",
+  TUMu_hookCode("openUILinkIn",
     ["{", "var lastArg = Object(arguments[arguments.length - 1]);"],
     [/(?=.*openLinkIn.*)/, function() {
       params.title = lastArg.title;
@@ -186,14 +186,14 @@
     }]
   );
 
-  TU_hookCode("openLinkIn",
+  TUMu_hookCode("openLinkIn",
     ["{", "var lastArg = Object(arguments[arguments.length - 1]);"],
     ["relatedToCurrent: aRelatedToCurrent", "$&, title: lastArg.title, itemId: lastArg.itemId"]
   );
 
-  TU_hookCode("PlacesUtils.getURLsForContainerNode", /uri: child.uri(?!.*itemId)/, "$&, title: child.title, itemId: child.itemId");
-  TU_hookCode("TU_openURINodesInTabs", "uri: aNodes[i].uri", "$&, title: aNodes[i].title, itemId: aNodes[i].itemId");
-  TU_hookCode("TU__openTabset",
+  TUMu_hookCode("PlacesUtils.getURLsForContainerNode", /uri: child.uri(?!.*itemId)/, "$&, title: child.title, itemId: child.itemId");
+  TUMu_hookCode("TUMu_openURINodesInTabs", "uri: aNodes[i].uri", "$&, title: aNodes[i].title, itemId: aNodes[i].itemId");
+  TUMu_hookCode("TUMu__openTabset",
     ["urls = []", "$&, titles = [], itemIds = [];"],
     ["urls.push(item.uri);", "$&;titles.push(item.title);itemIds.push(item.itemId == -1 ? null : item.itemId);"],
     [/loadTabs\((.*)\)/, function(s, s1) s.replace(s1, (s1 = s1.split(","), s1.push("{titles: titles, itemIds: itemIds}"), s1.join().replace("},{", ",")))]
@@ -205,11 +205,11 @@
     return;
 
   //右键点击书签
-  TU_hookCode("SidebarUtils.handleTreeClick",
-    ["aEvent.button == 2", "$& && (aEvent.ctrlKey || aEvent.altKey || aEvent.metaKey || !TU_getPref('extensions.tabutils.rightClickBookmarks', 0))"],
+  TUMu_hookCode("SidebarUtils.handleTreeClick",
+    ["aEvent.button == 2", "$& && (aEvent.ctrlKey || aEvent.altKey || aEvent.metaKey || !TUMu_getPref('extensions.tabutils.rightClickBookmarks', 0))"],
     ["aEvent.button == 1", "aEvent.button > 0"],
     ["}", "if (aEvent.button == 2) aEvent.preventDefault();"]
   );
-  TU_hookCode("whereToOpenLink", "e.button == 1", "e.button > 0");
-  TU_hookCode.call(document.getElementsByTagName("treechildren")[0], "_isAccelPressed", /aEvent.(ctrl|meta)Key/, "$& && aEvent.button != 2");
+  TUMu_hookCode("whereToOpenLink", "e.button == 1", "e.button > 0");
+  TUMu_hookCode.call(document.getElementsByTagName("treechildren")[0], "_isAccelPressed", /aEvent.(ctrl|meta)Key/, "$& && aEvent.button != 2");
 })();

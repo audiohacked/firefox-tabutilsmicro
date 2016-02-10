@@ -46,7 +46,7 @@ tabutils._phantomTabs = function() {
     else {
       aTab.setAttribute("pinned", true);
 
-      if (aRestoring == null && !gPrivateBrowsingUI.privateBrowsingEnabled && TU_getPref("extensions.tabutils.autoPin", true)) {
+      if (aRestoring == null && !gPrivateBrowsingUI.privateBrowsingEnabled && TUMu_getPref("extensions.tabutils.autoPin", true)) {
         PlacesUtils.tagging.tagURI(aTab.linkedBrowser.currentURI, ["pinned"]);
         this.updatePinnedTabsBar();
 
@@ -76,10 +76,10 @@ tabutils._phantomTabs = function() {
 
   gBrowser.unpinTab = function unpinTab(aTab) this.pinTab(aTab, false, false);
 
-  TU_hookCode("gBrowser.onTabRestoring", "}", function() {
+  TUMu_hookCode("gBrowser.onTabRestoring", "}", function() {
     this.pinTab(aTab, aTab.pinned, true, ss.getTabValue(aTab, "bookmarkId"));
 
-    if (aTab.pinned && TU_getPref("extensions.tabutils.pinTab.autoRevert", false)) {
+    if (aTab.pinned && TUMu_getPref("extensions.tabutils.pinTab.autoRevert", false)) {
       let uri;
       try {
         uri = PlacesUtils.bookmarks.getBookmarkURI(aTab.bookmarkId);
@@ -104,12 +104,12 @@ tabutils._phantomTabs = function() {
   gBrowser.autoPinTab = function autoPinTab(aTab, aURI, aTags) {
     if (!aTab.pinned &&
         aTags.indexOf("pinned") > -1 &&
-        TU_getPref("extensions.tabutils.autoPin", true) &&
+        TUMu_getPref("extensions.tabutils.autoPin", true) &&
         !Array.some(this.visibleTabs.slice(0, this._numPinnedTabs), function(bTab) bTab.linkedBrowser.currentURI.spec == aURI.spec)) {
       this.pinTab(aTab, true, false, PlacesUtils.getItemIdForTaggedURI(aURI, "pinned"));
 
       if (aTab.mCorrespondingButton &&
-          !TU_getPref("extensions.tabutils.pinTab.autoRevert", false) &&
+          !TUMu_getPref("extensions.tabutils.pinTab.autoRevert", false) &&
           PlacesUtils.annotations.itemHasAnnotation(aTab.bookmarkId, "tabState"))
       setTimeout(function() {
         aTab.linkedBrowser.stop();
@@ -118,10 +118,10 @@ tabutils._phantomTabs = function() {
     }
   };
 
-  TU_hookCode("gBrowser.onTabOpen", "}", "this.autoPinTab(aTab, uri, tags);");
-  TU_hookCode("gBrowser.onLocationChange", "}", "this.autoPinTab(aTab, uri, tags);");
+  TUMu_hookCode("gBrowser.onTabOpen", "}", "this.autoPinTab(aTab, uri, tags);");
+  TUMu_hookCode("gBrowser.onLocationChange", "}", "this.autoPinTab(aTab, uri, tags);");
 
-  TU_hookCode("gBrowser.onTabClose", "}", function() {
+  TUMu_hookCode("gBrowser.onTabClose", "}", function() {
     if (aTab.mCorrespondingButton && !gPrivateBrowsingUI.privateBrowsingEnabled) {
       PlacesUtils.setAnnotationsForItem(aTab.bookmarkId, [{name: "tabState", value: tabutils._ss.getTabState(aTab)}]);
       aTab.mCorrespondingButton.tab = null;
@@ -129,8 +129,8 @@ tabutils._phantomTabs = function() {
     }
   });
 
-  TU_hookCode("gBrowser.moveTabTo", /.*_numPinnedTabs.*/g, ";");
-  TU_hookCode("gBrowser.moveTabTo", "{", function() {
+  TUMu_hookCode("gBrowser.moveTabTo", /.*_numPinnedTabs.*/g, ";");
+  TUMu_hookCode("gBrowser.moveTabTo", "{", function() {
     aIndex = Math.min(Math.max(0, aIndex), this.mTabs.length - 1);
     if (aIndex == aTab._tPos)
       return;
@@ -167,7 +167,7 @@ tabutils._phantomTabs = function() {
     if (aTab.pinned ^ aTab._tPos < i)
       gBrowser.moveTabTo(aTab, aTab._tPos < i ? i - 1 : i, true);
 
-    if (aTab.pinned && TU_getPref("extensions.tabutils.pinTab.showPhantom", true)) {
+    if (aTab.pinned && TUMu_getPref("extensions.tabutils.pinTab.showPhantom", true)) {
       gBrowser.moveTabTo(aTab, aTab._tPos < i ? i - 1 : i, true);
 
       let pinnedbox = this.mTabstrip._pinnedbox, n = 0;
@@ -243,14 +243,14 @@ tabutils._phantomTabs = function() {
   };
   gBrowser.mTabContainer._positionPinnedTabs = gBrowser.mTabContainer.positionPinnedTabs;
 
-  TU_hookCode("gBrowser.mTabContainer.adjustTabstrip", "{", "if (arguments[0]) this.positionPinnedTabs();");
+  TUMu_hookCode("gBrowser.mTabContainer.adjustTabstrip", "{", "if (arguments[0]) this.positionPinnedTabs();");
 
   tabutils.addEventListener(gBrowser.mTabContainer, "overflow", function() {this.positionPinnedTabs();}, false);
   tabutils.addEventListener(gBrowser.mTabContainer, "underflow", function() {this.positionPinnedTabs();}, false);
 
   gBrowser.updatePinnedTabsBar = function updatePinnedTabsBar() {
     let tagId = -1;
-    if (TU_getPref("extensions.tabutils.pinTab.showPhantom", true))
+    if (TUMu_getPref("extensions.tabutils.pinTab.showPhantom", true))
       tagId = PlacesUtils.getItemIdForTag("pinned");
 
     let pinnedbox = this.mTabContainer.mTabstrip._pinnedbox;
@@ -349,9 +349,9 @@ tabutils._phantomTabs = function() {
     }
   }, false);
 
-  TU_hookCode("gBrowser.selectTabAtIndex", "this.visibleTabs", "this.visibleTabs.filter(function(aTab) !aTab.collapsed)");
+  TUMu_hookCode("gBrowser.selectTabAtIndex", "this.visibleTabs", "this.visibleTabs.filter(function(aTab) !aTab.collapsed)");
 
-  gBrowser.selectUnpinnedTabAtIndex = TU_hookFunc(gBrowser.selectTabAtIndex, "visibleTabs", "allTabs");
+  gBrowser.selectUnpinnedTabAtIndex = TUMu_hookFunc(gBrowser.selectTabAtIndex, "visibleTabs", "allTabs");
 
   gBrowser.selectPinnedTabAtIndex = function selectPinnedTabAtIndex(aIndex, aEvent) {
     var tabs = this.mTabContainer.mTabstrip._pinnedbox.childNodes;

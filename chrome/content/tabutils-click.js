@@ -12,12 +12,12 @@ tabutils._tabClickingOptions = function() {
   //     aTab.linkedBrowser.loadURIWithFlags(url, Ci.nsIWebNavigation.LOAD_FLAGS_ALLOW_THIRD_PARTY_FIXUP);
   //   }
   //   else {
-  //     this.loadOneTab(url, null, null, null, TU_getPref('extensions.tabutils.loadNewInBackground', false), true);
+  //     this.loadOneTab(url, null, null, null, TUMu_getPref('extensions.tabutils.loadNewInBackground', false), true);
   //   }
   // };
 
   //浏览历史菜单
-  // TU_hookCode("FillHistoryMenu",
+  // TUMu_hookCode("FillHistoryMenu",
   //   ["count <= 1", "count == 0"],
   //   [/(?=var webNav)/, function() {
   //     var tab = document.popupNode;
@@ -27,14 +27,14 @@ tabutils._tabClickingOptions = function() {
   //   }],
   //   ["gBrowser.webNavigation", "tab.linkedBrowser.webNavigation"]
   // );
-  // TU_hookCode("gotoHistoryIndex",
+  // TUMu_hookCode("gotoHistoryIndex",
   //   ["gBrowser.selectedTab", "tab", "g"],
   //   ["gBrowser", "tab.linkedBrowser", "g"],
   //   [/(?=let where)/, "let tab = gBrowser.mTabs[aEvent.target.parentNode.value];"]
   // );
 
-  // TU_hookCode("TabContextMenu.updateContextMenu", "aPopupMenu.triggerNode", "document.popupNode", "g");
-  // TU_hookCode("gBrowser.mTabContainer._selectNewTab", "{", function() {
+  // TUMu_hookCode("TabContextMenu.updateContextMenu", "aPopupMenu.triggerNode", "document.popupNode", "g");
+  // TUMu_hookCode("gBrowser.mTabContainer._selectNewTab", "{", function() {
   //   if (TMP_console.isCallerInList(["onxblmousedown"]) &&
   //       !aNewTab.selected)
   //     aNewTab.setAttribute("firstclick", true);
@@ -70,7 +70,7 @@ tabutils._tabClickingOptions = function() {
     else if (event.detail == 1 && !event.target.mOverCloseButton) {
       event.target._leftClickTimer = setTimeout(function() {
         this.doClickAction("left", event);
-      }.bind(this), TU_getPref("extensions.tabutils.leftClickTabDelay", 250));
+      }.bind(this), TUMu_getPref("extensions.tabutils.leftClickTabDelay", 250));
     }
   };
 
@@ -107,8 +107,8 @@ tabutils._tabClickingOptions = function() {
 
     var prefName = target.localName == "tab" ? "ClickTab" :
                    target.localName == "tabs" ? "ClickTabBar" : "ClickNewTabButton";
-    var action = TU_getPref("extensions.tabutils." + type + prefName, 0);
-    var code = TU_getPref("extensions.tabutils.mouse." + action + ".oncommand");
+    var action = TUMu_getPref("extensions.tabutils." + type + prefName, 0);
+    var code = TUMu_getPref("extensions.tabutils.mouse." + action + ".oncommand");
     if (code) {
       try {
         new Function("event", code)(event);
@@ -262,13 +262,13 @@ tabutils._tabClickingOptions = function() {
   tabutils.addEventListener(gBrowser.mTabContainer, "dblclick", function(event) {if (event.target.localName == "tabs") gBrowser.onTabBarDblClick(event);}, true);
 
   //Mouse release to select
-  // TU_hookCode("gBrowser.mTabContainer._selectNewTab", "{", function() {
+  // TUMu_hookCode("gBrowser.mTabContainer._selectNewTab", "{", function() {
   //   if (TMP_console.isCallerInList(["onxblmousedown"]) &&
-  //       TU_getPref("extensions.tabutils.mouseReleaseSelect", true))
+  //       TUMu_getPref("extensions.tabutils.mouseReleaseSelect", true))
   //     return;
   // });
 
-  // TU_hookCode("gBrowser.onTabClick", "{", function() {
+  // TUMu_hookCode("gBrowser.onTabClick", "{", function() {
   //   if (event.button == 0 && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey
   //       && event.target.localName == "tab" && !event.target.selected && !event.target.mOverCloseButton) {
   //     this.mTabContainer._selectNewTab(event.target);
@@ -279,12 +279,12 @@ tabutils._tabClickingOptions = function() {
   //Mouse hover to select
   // gBrowser.mTabContainer._mouseHoverSelectTimer = null;
   // tabutils.addEventListener(gBrowser.mTabContainer, 'mouseover', function(event) {
-  //   if (event.target.localName == 'tab' && !event.target.selected && TU_getPref("extensions.tabutils.mouseHoverSelect", false)) {
+  //   if (event.target.localName == 'tab' && !event.target.selected && TUMu_getPref("extensions.tabutils.mouseHoverSelect", false)) {
   //     clearTimeout(this._mouseHoverSelectTimer);
   //     this._mouseHoverSelectTimer = setTimeout(function(aTab) {
   //       if (aTab && !aTab.mOverCloseButton)
   //         gBrowser.selectedTab = aTab;
-  //     }, TU_getPref("extensions.tabutils.mouseHoverSelectDelay", 250), event.target);
+  //     }, TUMu_getPref("extensions.tabutils.mouseHoverSelectDelay", 250), event.target);
   //   }
   // }, false);
 
@@ -305,16 +305,16 @@ tabutils._tabClickingOptions = function() {
   //
   //   if (event.originalTarget != this.mTabstrip._scrollButtonUp &&
   //       event.originalTarget != this.mTabstrip._scrollButtonDown &&
-  //       TU_getPref("extensions.tabutils.mouseScrollSelect", false)) {
-  //     let scrollDir = event.detail < 0 ^ TU_getPref("extensions.tabutils.mouseScrollSelectDir", false) ? -1 : 1;
-  //     this.advanceSelectedTab(scrollDir, TU_getPref("extensions.tabutils.mouseScrollSelectWrap", false));
+  //       TUMu_getPref("extensions.tabutils.mouseScrollSelect", false)) {
+  //     let scrollDir = event.detail < 0 ^ TUMu_getPref("extensions.tabutils.mouseScrollSelectDir", false) ? -1 : 1;
+  //     this.advanceSelectedTab(scrollDir, TUMu_getPref("extensions.tabutils.mouseScrollSelectWrap", false));
   //     event.stopPropagation();
   //   }
   // }, true);
 
   //Center current tab
-  // TU_hookCode("gBrowser.onTabSelect", "}", function() {
-  //   if (TU_getPref("extensions.tabutils.centerCurrentTab", false)) {
+  // TUMu_hookCode("gBrowser.onTabSelect", "}", function() {
+  //   if (TUMu_getPref("extensions.tabutils.centerCurrentTab", false)) {
   //     let tabStrip = this.mTabContainer.mTabstrip;
   //     let scrollRect = tabStrip.scrollClientRect;
   //     let tabRect = aTab.getBoundingClientRect();

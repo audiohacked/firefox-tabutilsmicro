@@ -16,7 +16,7 @@
   <script type="application/javascript" src="tabutils-click.js"/>
   <script type="application/javascript">
   <![CDATA[
-    TU_hookCode("goDoCommand", /.*doCommand.*/, "$& else {let cmd = top.document.getElementById(arguments[1]);if (cmd) cmd.doCommand();}");
+    TUMu_hookCode("goDoCommand", /.*doCommand.*/, "$& else {let cmd = top.document.getElementById(arguments[1]);if (cmd) cmd.doCommand();}");
   ]]>
   </script>
 

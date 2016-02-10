@@ -57,24 +57,24 @@ tabutils._multiTabHandler = function() {
     this._lastClickedTab = bTab;
   };
 
-  // TU_hookCode("gBrowser.onTabSelect", "}", function() {
+  // TUMu_hookCode("gBrowser.onTabSelect", "}", function() {
   //   if (!aTab.hasAttribute("multiselected"))
   //     this.selectedTabs = [];
   // });
   //
-  // TU_hookCode("gBrowser.onTabMove", "{", function() {
+  // TUMu_hookCode("gBrowser.onTabMove", "{", function() {
   //   if (aTab.hasAttribute("multiselected"))
   //     this._selectedTabs = null;
   // });
   //
-  // TU_hookCode("gBrowser.onTabHide", "}", function() {
+  // TUMu_hookCode("gBrowser.onTabHide", "}", function() {
   //   if (aTab.hasAttribute("multiselected")) {
   //     aTab.removeAttribute("multiselected");
   //     this._selectedTabs = null;
   //   }
   // });
 
-  // TU_hookCode("gBrowser.onStackCollapsed", "}", function() {
+  // TUMu_hookCode("gBrowser.onStackCollapsed", "}", function() {
   //   let tabs = this.siblingTabsOf(aTab);
   //   if (tabs.some(function(aTab) aTab.hasAttribute("multiselected"))) {
   //     tabs.forEach(function(aTab) aTab.removeAttribute("multiselected"));
@@ -143,7 +143,7 @@ tabutils._multiTabHandler = function() {
   };
 
   //关闭多个标签页
-  TU_hookCode("gBrowser.warnAboutClosingTabs", /\w+(?= <= 1)/, "($& = arguments[1] && 'length' in arguments[1] ? arguments[1].length : $&)"); // Bug 866880 [Fx24]
+  TUMu_hookCode("gBrowser.warnAboutClosingTabs", /\w+(?= <= 1)/, "($& = arguments[1] && 'length' in arguments[1] ? arguments[1].length : $&)"); // Bug 866880 [Fx24]
   gBrowser.removeTabsBut = function removeTabsBut(aTabs, bTabs) {
     aTabs = aTabs ? "length" in aTabs ? aTabs : [aTabs] : [];
     bTabs = bTabs ? "length" in bTabs ? bTabs : [bTabs] : [];
@@ -173,7 +173,7 @@ tabutils._multiTabHandler = function() {
     }
   };
 
-  TU_hookCode("undoCloseTab", /.*(ss|SessionStore).undoCloseTab.*/, "for (let i = aIndex == null ? gBrowser._lastClosedTabsCount || 1 : 1; i > 0; i--) $&"); // Bug 898732 [Fx26]
+  TUMu_hookCode("undoCloseTab", /.*(ss|SessionStore).undoCloseTab.*/, "for (let i = aIndex == null ? gBrowser._lastClosedTabsCount || 1 : 1; i > 0; i--) $&"); // Bug 898732 [Fx26]
 
   gBrowser.closeLeftTabs = function(aTab) this.removeTabsBut(this.leftTabsOf(aTab), aTab);
   gBrowser.closeRightTabs = function(aTab) this.removeTabsBut(this.rightTabsOf(aTab), aTab);
@@ -215,7 +215,7 @@ tabutils._multiTabHandler = function() {
     this.moveTabTo(aTab, bTab ? aTab._tPos > bTab._tPos ? bTab._tPos + 1 : bTab._tPos : this.mTabs.length - 1);
   };
 
-  // TU_hookCode("gBrowser.onTabMove", "{", function() {
+  // TUMu_hookCode("gBrowser.onTabMove", "{", function() {
   //   if (aTab._suppressTabMove)
   //     return;
   // });
@@ -235,11 +235,11 @@ tabutils._multiTabHandler = function() {
     }
   }, true);
 
-  TU_hookCode("gBrowser.mTabContainer._setEffectAllowedForDataTransfer",
-    ["dt.mozItemCount > 1", "false"]
-  );
+  // TUMu_hookCode("gBrowser.mTabContainer._setEffectAllowedForDataTransfer",
+  //   ["dt.mozItemCount > 1", "false"]
+  // );
 
-  // TU_hookCode("gBrowser.onTabMove", "}", function() {
+  // TUMu_hookCode("gBrowser.onTabMove", "}", function() {
   //   if (aTab.hasAttribute("multiselected")) {
   //     let selectedTabs = this.selectedTabs;
   //     if (selectedTabs[selectedTabs.length - 1]._tPos - selectedTabs[0]._tPos >= selectedTabs.length) {
@@ -261,16 +261,16 @@ tabutils._multiTabHandler = function() {
   //   }
   // });
 
-  TU_hookCode("gBrowser.moveTabTo", // Bug 822068 [Fx20]
+  TUMu_hookCode("gBrowser.moveTabTo", // Bug 822068 [Fx20]
     ["this.mCurrentTab._selected = false;", "wasFocused = (document.activeElement == this.mCurrentTab);$&"],
     ["this.mCurrentTab._selected = true;", "$&;if (wasFocused) this.mCurrentTab.focus();"]
   );
 
   ["moveTabBackward", "moveTabForward", "moveTabToStart", "moveTabToEnd"].forEach(function(aMethod) {
-    TU_hookCode.call(gBrowser, aMethod, "this.mCurrentTab.focus();", "");
+    TUMu_hookCode.call(gBrowser, aMethod, "this.mCurrentTab.focus();", "");
   });
 
-  TU_hookCode("gBrowser.moveTabBackward", "this.mCurrentTab._tPos", (function() { // Bug 656222 [Fx20]
+  TUMu_hookCode("gBrowser.moveTabBackward", "this.mCurrentTab._tPos", (function() { // Bug 656222 [Fx20]
     (function () {
       let tab = this.mCurrentTab.previousSibling;
       while (tab && tab.boxObject.width == 0)
@@ -279,7 +279,7 @@ tabutils._multiTabHandler = function() {
     }).apply(this)
   }).toString().replace(/^.*{|}$/g, ""));
 
-  TU_hookCode("gBrowser.moveTabForward", "this.mCurrentTab._tPos", (function() {
+  TUMu_hookCode("gBrowser.moveTabForward", "this.mCurrentTab._tPos", (function() {
     (function () {
       let tab = this.mCurrentTab.nextSibling;
       while (tab && tab.boxObject.width == 0)
@@ -298,7 +298,7 @@ tabutils._multiTabHandler = function() {
   //   ["gBrowser.pinTab", ["pinned"]],
   //   ["gBrowser.autoReloadTab", ["autoReload"]]
   // ].forEach(function([aFuncName, aAttrs]) {
-  //   TU_hookCode(aFuncName, "{", (function() {
+  //   TUMu_hookCode(aFuncName, "{", (function() {
   //     if ("length" in arguments[0]) {
   //       let aTabs = Array.slice(arguments[0]);
   //       if (aForce == null)
@@ -313,7 +313,7 @@ tabutils._multiTabHandler = function() {
   //   }).toString().replace(/^.*{|}$/g, "").replace("aAttrs", aAttrs.toSource()));
   // });
 
-  TU_hookCode("gBrowser.reloadTab", /.*reload\b.*/, "try {$&} catch (e) {}");
+  TUMu_hookCode("gBrowser.reloadTab", /.*reload\b.*/, "try {$&} catch (e) {}");
 
   gBrowser.moveTabToWindow = function moveTabToWindow(aTabs, aWindow) {
     if (!aWindow) {
@@ -333,13 +333,13 @@ tabutils._multiTabHandler = function() {
       bTabs.push(bTab);
     }, aWindow.gBrowser);
 
-    if (bTabs.length > 1 && aWindow.TU_getPref("extensions.tabutils.autoStack", false))
+    if (bTabs.length > 1 && aWindow.TUMu_getPref("extensions.tabutils.autoStack", false))
       aWindow.gBrowser.stackTabs(bTabs);
 
     return aWindow;
   };
 
-  TU_hookCode("gBrowser.swapBrowsersAndCloseOther", /(?=.*_beginRemoveTab.*)/, function() {
+  TUMu_hookCode("gBrowser.swapBrowsersAndCloseOther", /(?=.*_beginRemoveTab.*)/, function() {
     if ([gBrowserInit.onLoad, gBrowserInit._delayedStartup].indexOf(arguments.callee.caller) > -1 ||  // Bug 756313 [Fx19]
         TMP_console.isCallerInList(["onxbldrop", "_handleTabDrop"])) {
       let selectedTabs = aOtherTab._selectedTabs || remoteBrowser.contextTabsOf(aOtherTab);
@@ -356,7 +356,7 @@ tabutils._multiTabHandler = function() {
           bTabs.push(bTab);
         }, this);
 
-        if (bTabs.length < this.mTabs.length && TU_getPref("extensions.tabutils.autoStack", false))
+        if (bTabs.length < this.mTabs.length && TUMu_getPref("extensions.tabutils.autoStack", false))
           this.stackTabs(bTabs);
 
         return;

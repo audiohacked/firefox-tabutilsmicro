@@ -41,7 +41,7 @@ tabutils._multirowTabs = function() {
       gNavToolbox.style.marginTop = -gNavToolbox.getBoundingClientRect().height + "px";
   }, false);
 
-  TU_hookCode("gBrowser.mTabContainer._getDropIndex",
+  TUMu_hookCode("gBrowser.mTabContainer._getDropIndex",
     [/event.screenX.*width \/ 2/g, function(s) s + " && " + s.replace("screenX", "screenY", "g").replace("width / 2", "height")
                                                  + " || " + s.replace("screenX", "screenY", "g").replace("width / 2", "height * 0")]
   );
@@ -71,9 +71,9 @@ tabutils._multirowTabs = function() {
     ind.firstChild.style.verticalAlign = "bottom";
   }, true);
 
-  TU_hookCode("gBrowser.mTabContainer._animateTabMove", "{", function() {
-    if (TU_getPref("extensions.tabutils.disableTabMoveAnimation", true)) {
-      TU_hookFunc(arguments.callee.caller.toString().match(/^.*{|var (ind|tabStrip|ltr).*|var pixelsToScroll[\s\S]*$/g).join("\n"),
+  TUMu_hookCode("gBrowser.mTabContainer._animateTabMove", "{", function() {
+    if (TUMu_getPref("extensions.tabutils.disableTabMoveAnimation", true)) {
+      TUMu_hookFunc(arguments.callee.caller.toString().match(/^.*{|var (ind|tabStrip|ltr).*|var pixelsToScroll[\s\S]*$/g).join("\n"),
         [/.*scrollByPixels.*/, ";"],
         [/.*effects == "move"[\s\S]*?(?=var (newIndex|scrollRect|rect))/, ""]
       ).apply(this, arguments);
@@ -82,7 +82,7 @@ tabutils._multirowTabs = function() {
   });
 
   tabutils.addEventListener(gBrowser.mTabContainer, "drop", function(event) {
-    if (!TU_getPref("extensions.tabutils.disableTabMoveAnimation", true))
+    if (!TUMu_getPref("extensions.tabutils.disableTabMoveAnimation", true))
       return;
 
     let dt = event.dataTransfer;
@@ -94,7 +94,7 @@ tabutils._multirowTabs = function() {
     }
   }, true);
 
-  TU_hookCode("gBrowser.moveTabTo", "{", function() {
+  TUMu_hookCode("gBrowser.moveTabTo", "{", function() {
     if (TMP_console.isCallerInList(["onxbldrop", "ondrop"])) {
       if (aTab.pinned) {
         if (aIndex >= this._numPinnedTabs)
@@ -115,7 +115,7 @@ tabutils._multirowTabs = function() {
   }, true);
 
   tabutils._tabPrefObserver.showAllTabs = function() {
-    let showAllTabs = TU_getPref("extensions.tabutils.showAllTabs");
+    let showAllTabs = TUMu_getPref("extensions.tabutils.showAllTabs");
     if (showAllTabs) {
       gBrowser.mTabContainer.setAttribute("showAllTabs", true);
       gBrowser.mTabContainer.enterBlockMode();

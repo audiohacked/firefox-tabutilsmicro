@@ -67,16 +67,16 @@ var tabutils = {
 //      return stack;
 //    });
 //
-//    TU_hookCode("gBrowser.addTab", "{", "Cu.reportError([arguments.callee.stack, aURI]);");
-//    TU_hookCode("gBrowser.moveTabTo", "{", "Cu.reportError([arguments.callee.stack, aTab._tPos, aIndex]);");
-//    TU_hookCode("gBrowser._beginRemoveTab", "{", "Cu.reportError([arguments.callee.stack]);");
-//    TU_hookCode("gBrowser._endRemoveTab", "{", "Cu.reportError([arguments.callee.stack]);");
-//    TU_hookCode("gBrowser._blurTab", "{", "Cu.reportError([arguments.callee.stack]);");
+//    TUMu_hookCode("gBrowser.addTab", "{", "Cu.reportError([arguments.callee.stack, aURI]);");
+//    TUMu_hookCode("gBrowser.moveTabTo", "{", "Cu.reportError([arguments.callee.stack, aTab._tPos, aIndex]);");
+//    TUMu_hookCode("gBrowser._beginRemoveTab", "{", "Cu.reportError([arguments.callee.stack]);");
+//    TUMu_hookCode("gBrowser._endRemoveTab", "{", "Cu.reportError([arguments.callee.stack]);");
+//    TUMu_hookCode("gBrowser._blurTab", "{", "Cu.reportError([arguments.callee.stack]);");
 //
-//    TU_hookCode("gBrowser.pinTab", "{", "Cu.reportError([arguments.callee.stack]);");
-//    TU_hookCode("gBrowser.mTabContainer.adjustTabstrip", "{", "Cu.reportError([arguments.callee.stack]);");
-//    TU_hookCode("gBrowser.mTabContainer.positionPinnedTabs", "{", "Cu.reportError([arguments.callee.stack]);");
-//    TU_hookCode("gBrowser.mTabContainer.stylePinnedTabs", "{", "Cu.reportError([arguments.callee.stack]);");
+//    TUMu_hookCode("gBrowser.pinTab", "{", "Cu.reportError([arguments.callee.stack]);");
+//    TUMu_hookCode("gBrowser.mTabContainer.adjustTabstrip", "{", "Cu.reportError([arguments.callee.stack]);");
+//    TUMu_hookCode("gBrowser.mTabContainer.positionPinnedTabs", "{", "Cu.reportError([arguments.callee.stack]);");
+//    TUMu_hookCode("gBrowser.mTabContainer.stylePinnedTabs", "{", "Cu.reportError([arguments.callee.stack]);");
   },
 
   onload: function() {
